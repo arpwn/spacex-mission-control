@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🚀 SpaceX Mission Control Dashboard
 
-## Getting Started
+A modern, responsive dashboard to explore the history of SpaceX rocket launches using the public SpaceX API.
+Built with a strong focus on UX, clean architecture, and maintainability.
 
-First, run the development server:
+🧱 Architecture & Tech Stack
+Framework
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Next.js (App Router)
+Chosen for its file-based routing, built-in loading/error states, and excellent support for server-first applications with client-side interactivity where needed.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Language
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+TypeScript (strict mode)
+Used across the entire project to ensure type safety, reduce runtime errors, and improve long-term maintainability.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Styling
 
-## Learn More
+Tailwind CSS
+Enables rapid UI iteration, consistent spacing/typography, and responsive design without context-switching between files.
 
-To learn more about Next.js, take a look at the following resources:
+🤖 AI Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+AI tools were used as an accelerator, not a replacement for decision-making.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Specifically:
 
-## Deploy on Vercel
+Used ChatGPT to:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Brainstorm layout ideas and UX patterns for the dashboard.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Generate initial TypeScript interfaces based on the SpaceX API response.
