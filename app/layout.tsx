@@ -11,7 +11,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `try { const requested = new URLSearchParams(location.search).get('lang'); const lang = requested === 'en' || requested === 'es' ? requested : localStorage.getItem('lang'); document.documentElement.lang = lang === 'en' ? 'en' : 'es'; } catch {}` }} />
+      </head>
       <body>{children}</body>
     </html>
   );

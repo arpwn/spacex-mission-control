@@ -539,3 +539,5 @@ footer {
     gap: 12px;
   }
 }
+
+html[lang="en"] .loading-es, html:not([lang="en"]) .loading-en { display: none; }
