@@ -1,7 +1,9 @@
 export default function Loading() {
   return (
-    <div className="flex h-screen items-center justify-center">
-      <span className="text-zinc-400">Loading...</span>
-    </div>
+    <main className="container empty-state" role="status">
+      <p className="eyebrow">SPACEX MISSION CONTROL</p>
+      <h1>Conectando con el archivo…</h1>
+      <p>Cargando misiones y resultados.</p>
+    </main>
   );
 }

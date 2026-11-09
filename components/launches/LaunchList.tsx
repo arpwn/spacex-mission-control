@@ -1,102 +1,140 @@
 "use client";
-
-import { useMemo, useState } from "react";
-import { Launch } from "@/types/spacex";
+import { useState } from "react";
+import type { Launch } from "@/types/spacex";
+import { filterLaunches } from "@/lib/launches";
 import { LaunchCard } from "./LaunchCard";
 import { LaunchDetailsModal } from "./LaunchDetailsModal";
-import { AnimatePresence } from "framer-motion";
-
-type StatusFilter = "all" | "success" | "failure";
-type SortOrder = "newest" | "oldest";
-
-interface Props {
-  launches: Launch[];
-}
-
-export function LaunchList({ launches }: Props) {
-  const [selectedLaunch, setSelectedLaunch] = useState<Launch | null>(null);
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
-
-  const filteredLaunches = useMemo(() => {
-    let result = [...launches];
-
-    // Filter by status
-    if (status !== "all") {
-      result = result.filter((launch) =>
-        status === "success"
-          ? launch.success === true
-          : launch.success === false
-      );
-    }
-
-    // Sort by date
-    result.sort((a, b) => {
-      const dateA = new Date(a.date_utc).getTime();
-      const dateB = new Date(b.date_utc).getTime();
-      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-    });
-
-    return result;
-  }, [launches, status, sortOrder]);
-
+const pageSize = 12;
+export function LaunchList({ launches }: { launches: Launch[] }) {
+  const [selected, setSelected] = useState<Launch | null>(null);
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("confirmed");
+  const [year, setYear] = useState("all");
+  const [sort, setSort] = useState("newest");
+  const [page, setPage] = useState(1);
+  const years = [
+    ...new Set(launches.map((l) => new Date(l.date_utc).getUTCFullYear())),
+  ].sort((a, b) => b - a);
+  const filtered = filterLaunches(launches, { query, status, year, sort });
+  const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const current = Math.min(page, pages);
+  const visible = filtered.slice((current - 1) * pageSize, current * pageSize);
+  function reset() {
+    setQuery("");
+    setStatus("confirmed");
+    setYear("all");
+    setSort("newest");
+    setPage(1);
+  }
   return (
     <>
-      {/* Controls */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-2">
-          {(["all", "success", "failure"] as StatusFilter[]).map((value) => (
-            <button
-              key={value}
-              onClick={() => setStatus(value)}
-              className={`rounded-lg px-3 py-1 text-sm transition ${
-                status === value
-                  ? "bg-zinc-100 text-zinc-900"
-                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-              }`}
-            >
-              {value.charAt(0).toUpperCase() + value.slice(1)}
-            </button>
-          ))}
+      <section className="filters" aria-label="Filtros del archivo">
+        <div className="search-field">
+          <label htmlFor="mission-search">Buscar misión</label>
+          <input
+            id="mission-search"
+            type="search"
+            placeholder="Ej. Crew, Starlink, Falcon…"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(1);
+            }}
+          />
         </div>
-
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-          className="rounded-lg bg-zinc-800 px-3 py-1 text-sm text-zinc-100"
-        >
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-        </select>
+        <div>
+          <label htmlFor="status-filter">Resultado</label>
+          <select
+            id="status-filter"
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+            }}
+          >
+            {[
+              ["confirmed", "Con resultado"],
+              ["all", "Todos"],
+              ["success", "Éxito"],
+              ["failure", "Fallo"],
+              ["unconfirmed", "Sin confirmar"],
+            ].map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="year-filter">Año</label>
+          <select
+            id="year-filter"
+            value={year}
+            onChange={(e) => {
+              setYear(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="all">Todos los años</option>
+            {years.map((y) => (
+              <option key={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sort-filter">Orden</label>
+          <select
+            id="sort-filter"
+            value={sort}
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="newest">Más recientes</option>
+            <option value="oldest">Más antiguos</option>
+          </select>
+        </div>
+      </section>
+      <div className="results-heading">
+        <h2>Archivo de lanzamientos</h2>
+        <p role="status">
+          {filtered.length} {filtered.length === 1 ? "resultado" : "resultados"} · Página {current} de {pages}
+        </p>
       </div>
-
-      {/* Grid */}
-      {filteredLaunches.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
-          <p className="text-lg">No launches found 🚫</p>
-          <p className="text-sm mt-1">Try adjusting your filters</p>
+      {!visible.length ? (
+        <div className="empty-state">
+          <h3>No encontramos esa misión.</h3>
+          <p>Prueba otro nombre, año o resultado.</p>
+          <button onClick={reset}>Restablecer filtros</button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredLaunches.map((launch) => (
-            <LaunchCard
-              key={launch.id}
-              launch={launch}
-              onClick={() => setSelectedLaunch(launch)}
-            />
+        <div className="launch-grid">
+          {visible.map((l) => (
+            <LaunchCard key={l.id} launch={l} onClick={() => setSelected(l)} />
           ))}
         </div>
       )}
-
-      {/* Modal */}
-      <AnimatePresence>
-        {selectedLaunch && (
-          <LaunchDetailsModal
-            launch={selectedLaunch}
-            onClose={() => setSelectedLaunch(null)}
-          />
-        )}
-      </AnimatePresence>
+      <nav className="pagination" aria-label="Paginación de lanzamientos">
+        <button disabled={current === 1} onClick={() => setPage(current - 1)}>
+          ← Anterior
+        </button>
+        <span>
+          {current} / {pages}
+        </span>
+        <button
+          disabled={current === pages}
+          onClick={() => setPage(current + 1)}
+        >
+          Siguiente →
+        </button>
+      </nav>
+      {selected && (
+        <LaunchDetailsModal
+          launch={selected}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </>
   );
 }

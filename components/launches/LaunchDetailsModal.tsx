@@ -1,89 +1,95 @@
 "use client";
-
-import { Launch } from "@/types/spacex";
-import { motion } from "framer-motion";
-
-interface Props {
+import { useEffect, useRef } from "react";
+import type { Launch } from "@/types/spacex";
+import { missionDate, missionStatus } from "@/lib/launches";
+export function LaunchDetailsModal({
+  launch,
+  onClose,
+}: {
   launch: Launch;
   onClose: () => void;
-}
-
-export function LaunchDetailsModal({ launch, onClose }: Props) {
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (dialog.current && !dialog.current.open) dialog.current.showModal();
+  }, []);
+  const sources = [
+    ["Transmisión de la misión", launch.links.webcast],
+    ["Wikipedia", launch.links.wikipedia],
+    ["Artículo", launch.links.article],
+  ];
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
+    <dialog
+      ref={dialog}
+      className="launch-dialog"
+      aria-labelledby="mission-title"
+      onClose={onClose}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          const r = e.currentTarget.getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          )
+            dialog.current?.close();
+        }
+      }}
     >
-      <motion.div
-        className="w-full max-w-2xl rounded-xl bg-zinc-900 p-6 text-zinc-100"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <h2 className="text-xl font-semibold">{launch.name}</h2>
-          <button
-            onClick={onClose}
-            className="text-zinc-400 hover:text-white"
-          >
-            ✕
-          </button>
+      <div className="dialog-top">
+        <span className="eyebrow">ARCHIVO DE MISIÓN</span>
+        <button
+          className="close-dialog"
+          onClick={() => dialog.current?.close()}
+          aria-label="Cerrar misión"
+        >
+          ×
+        </button>
+      </div>
+      <h2 id="mission-title">{launch.name}</h2>
+      <p className="mission-date">
+        {missionDate(launch.date_utc)} · Fecha en UTC
+      </p>
+      <dl className="mission-facts">
+        <div>
+          <dt>Resultado</dt>
+          <dd>{missionStatus(launch)}</dd>
         </div>
-
-        {/* Meta */}
-        <p className="text-sm text-zinc-400 mt-1">
-          {new Date(launch.date_utc).toDateString()}
+        <div>
+          <dt>Número de vuelo</dt>
+          <dd>{launch.flight_number || "No indicado"}</dd>
+        </div>
+      </dl>
+      <h3>Contexto de la misión</h3>
+      <p className="dialog-description">
+        {launch.details ||
+          "La API no incluye una descripción de esta misión. Consulta los enlaces disponibles para ampliar el contexto."}
+      </p>
+      {launch.success === null && (
+        <p className="archive-note">
+          Este registro no tiene un resultado confirmado en la fuente; su fecha
+          no demuestra que la misión se haya completado.
         </p>
-
-        {/* Status */}
-        {launch.success !== null && (
-          <span
-            className={`inline-block mt-3 text-xs px-2 py-1 rounded ${
-              launch.success
-                ? "bg-green-500/20 text-green-400"
-                : "bg-red-500/20 text-red-400"
-            }`}
-          >
-            {launch.success ? "Mission Success" : "Mission Failed"}
-          </span>
-        )}
-
-        {/* Description */}
-        {launch.details && (
-          <p className="mt-4 text-sm text-zinc-300">
-            {launch.details}
-          </p>
-        )}
-
-        {/* Video */}
-        {launch.links.webcast && (
-          <div className="mt-6 aspect-video">
-            <iframe
-              className="w-full h-full rounded"
-              src={launch.links.webcast.replace("watch?v=", "embed/")}
-              allowFullScreen
-            />
-          </div>
-        )}
-
-        {/* Links */}
-        <div className="mt-4 flex gap-4 text-sm">
-          {launch.links.wikipedia && (
+      )}
+      <h3>Fuentes y enlaces</h3>
+      <div className="mission-sources">
+        {sources
+          .filter(([, url]) => url?.startsWith("https://"))
+          .map(([label, url]) => (
             <a
-              href={launch.links.wikipedia}
+              key={label}
+              href={url!}
               target="_blank"
-              className="text-blue-400 hover:underline"
+              rel="noopener noreferrer"
             >
-              Wikipedia
+              {label} ↗
             </a>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
+          ))}
+        {!sources.some(([, url]) => url?.startsWith("https://")) && (
+          <p>La fuente no incluye enlaces adicionales.</p>
+        )}
+      </div>
+    </dialog>
   );
 }

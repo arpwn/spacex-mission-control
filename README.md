@@ -30,3 +30,12 @@ Used ChatGPT to:
 Brainstorm layout ideas and UX patterns for the dashboard.
 
 Generate initial TypeScript interfaces based on the SpaceX API response.
+
+
+## Archivo histórico
+
+Incluye búsqueda por misión, filtros por año y resultado, orden cronológico, paginación y detalle en un diálogo nativo con navegación por teclado. La vista inicial excluye registros sin resultado confirmado. Las fechas se muestran en UTC.
+
+La API comunitaria de r/SpaceX no es una fuente de seguimiento en tiempo real. Su repositorio fue archivado: https://github.com/r-spacex/SpaceX-API. Si la consulta falla o tarda más de cuatro segundos, la interfaz muestra una selección explícita de tres misiones de referencia con enlaces a NASA. Esta selección no se presenta como un archivo completo ni como una respuesta de la API. Las fuentes están en `lib/reference-launches.ts`.
+
+Ejecuta `npm run test` (Node.js 22 o posterior), `npm run build` y `npm run lint`.

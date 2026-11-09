@@ -1,17 +1,18 @@
 import "./globals.css";
-import { Sidebar } from "@/components/layout/Sidebar";
-
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "SpaceX Mission Control — Archivo de lanzamientos",
+  description:
+    "Explora el archivo histórico de lanzamientos de SpaceX con búsqueda, filtros por año, resultados y detalle de misión.",
+};
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="flex min-h-screen bg-zinc-950 text-zinc-100">
-        <Sidebar />
-        <main className="flex-1 p-6">{children}</main>
-      </body>
+    <html lang="es">
+      <body>{children}</body>
     </html>
   );
 }

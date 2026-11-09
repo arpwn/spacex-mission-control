@@ -1,5 +1,6 @@
 export interface Launch {
   id: string;
+  flight_number?: number;
   name: string;
   date_utc: string;
   details: string | null;
@@ -7,6 +8,7 @@ export interface Launch {
   links: {
     webcast: string | null;
     wikipedia: string | null;
+    article?: string | null;
     patch: {
       small: string | null;
     };
