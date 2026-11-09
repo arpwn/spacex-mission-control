@@ -39,3 +39,8 @@ Incluye búsqueda por misión, filtros por año y resultado, orden cronológico,
 La API comunitaria de r/SpaceX no es una fuente de seguimiento en tiempo real. Su repositorio fue archivado: https://github.com/r-spacex/SpaceX-API. Si la consulta falla o tarda más de cuatro segundos, la interfaz muestra una selección explícita de tres misiones de referencia con enlaces a NASA. Esta selección no se presenta como un archivo completo ni como una respuesta de la API. Las fuentes están en `lib/reference-launches.ts`.
 
 Ejecuta `npm run test` (Node.js 22 o posterior), `npm run build` y `npm run lint`.
+
+
+## Idiomas
+
+La interfaz admite español e inglés mediante el selector ES / EN. La preferencia se guarda en este navegador y también puede definirse al abrir `?lang=es` o `?lang=en`. Cambiar el idioma conserva los datos de los formularios y los filtros activos. Las etiquetas, validaciones y salidas generadas se adaptan al idioma; los textos libres escritos por el usuario se conservan.

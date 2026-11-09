@@ -32,8 +32,8 @@ export function missionStatus(launch: Launch) {
       ? "Fallo"
       : "Sin confirmar";
 }
-export function missionDate(date: string) {
-  return new Date(date).toLocaleDateString("es-MX", {
+export function missionDate(date: string, lang: "es" | "en" = "es") {
+  return new Date(date).toLocaleDateString(lang === "es" ? "es-MX" : "en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",

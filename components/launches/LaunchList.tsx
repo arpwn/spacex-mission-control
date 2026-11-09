@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/lib/locale";
 import { useState } from "react";
 import type { Launch } from "@/types/spacex";
 import { filterLaunches } from "@/lib/launches";
@@ -6,6 +7,7 @@ import { LaunchCard } from "./LaunchCard";
 import { LaunchDetailsModal } from "./LaunchDetailsModal";
 const pageSize = 12;
 export function LaunchList({ launches }: { launches: Launch[] }) {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState<Launch | null>(null);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("confirmed");
@@ -28,13 +30,13 @@ export function LaunchList({ launches }: { launches: Launch[] }) {
   }
   return (
     <>
-      <section className="filters" aria-label="Filtros del archivo">
+      <section className="filters" aria-label={t("Filtros del archivo")}>
         <div className="search-field">
-          <label htmlFor="mission-search">Buscar misión</label>
+          <label htmlFor="mission-search">{t("Buscar misión")}</label>
           <input
             id="mission-search"
             type="search"
-            placeholder="Ej. Crew, Starlink, Falcon…"
+            placeholder={t("Ej. Crew, Starlink, Falcon…")}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -43,7 +45,7 @@ export function LaunchList({ launches }: { launches: Launch[] }) {
           />
         </div>
         <div>
-          <label htmlFor="status-filter">Resultado</label>
+          <label htmlFor="status-filter">{t("Resultado")}</label>
           <select
             id="status-filter"
             value={status}
@@ -60,13 +62,13 @@ export function LaunchList({ launches }: { launches: Launch[] }) {
               ["unconfirmed", "Sin confirmar"],
             ].map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
         </div>
         <div>
-          <label htmlFor="year-filter">Año</label>
+          <label htmlFor="year-filter">{t("Año")}</label>
           <select
             id="year-filter"
             value={year}
@@ -75,14 +77,16 @@ export function LaunchList({ launches }: { launches: Launch[] }) {
               setPage(1);
             }}
           >
-            <option value="all">Todos los años</option>
+            <option value="all">{t("Todos los años")}</option>
             {years.map((y) => (
-              <option key={y}>{y}</option>
+              <option key={y} value={y}>
+                {t(y)}
+              </option>
             ))}
           </select>
         </div>
         <div>
-          <label htmlFor="sort-filter">Orden</label>
+          <label htmlFor="sort-filter">{t("Orden")}</label>
           <select
             id="sort-filter"
             value={sort}
@@ -91,22 +95,24 @@ export function LaunchList({ launches }: { launches: Launch[] }) {
               setPage(1);
             }}
           >
-            <option value="newest">Más recientes</option>
-            <option value="oldest">Más antiguos</option>
+            <option value="newest">{t("Más recientes")}</option>
+            <option value="oldest">{t("Más antiguos")}</option>
           </select>
         </div>
       </section>
       <div className="results-heading">
-        <h2>Archivo de lanzamientos</h2>
+        <h2>{t("Archivo de lanzamientos")}</h2>
         <p role="status">
-          {filtered.length} {filtered.length === 1 ? "resultado" : "resultados"} · Página {current} de {pages}
+          {filtered.length}{" "}
+          {filtered.length === 1 ? t("resultado") : t("resultados")}{" "}
+          {t("· Página")} {current} {t("de")} {pages}
         </p>
       </div>
       {!visible.length ? (
         <div className="empty-state">
-          <h3>No encontramos esa misión.</h3>
-          <p>Prueba otro nombre, año o resultado.</p>
-          <button onClick={reset}>Restablecer filtros</button>
+          <h3>{t("No encontramos esa misión.")}</h3>
+          <p>{t("Prueba otro nombre, año o resultado.")}</p>
+          <button onClick={reset}>{t("Restablecer filtros")}</button>
         </div>
       ) : (
         <div className="launch-grid">
@@ -115,9 +121,9 @@ export function LaunchList({ launches }: { launches: Launch[] }) {
           ))}
         </div>
       )}
-      <nav className="pagination" aria-label="Paginación de lanzamientos">
+      <nav className="pagination" aria-label={t("Paginación de lanzamientos")}>
         <button disabled={current === 1} onClick={() => setPage(current - 1)}>
-          ← Anterior
+          {t("← Anterior")}{" "}
         </button>
         <span>
           {current} / {pages}
@@ -126,7 +132,7 @@ export function LaunchList({ launches }: { launches: Launch[] }) {
           disabled={current === pages}
           onClick={() => setPage(current + 1)}
         >
-          Siguiente →
+          {t("Siguiente →")}{" "}
         </button>
       </nav>
       {selected && (
